@@ -1,17 +1,20 @@
-from tkinter import *
-from requests import *
-from openpyxl import Workbook
 from openpyxl.utils import get_column_letter
-from openpyxl import load_workbook
-from time import *
-from infi.systray import SysTrayIcon
-from binance.client import Client
 from py_currency_converter import convert
-import json
+from infi.systray import SysTrayIcon
+from openpyxl import load_workbook
+from binance.client import Client
+from openpyxl import Workbook
+from time import strftime
 import time
-import ctypes
 import os
-import sys
+import pandas as pd
+import matplotlib.pyplot as plt
+
+
+
+
+
+
 
 api_key = os.environ.get('binance_api')
 api_secret = os.environ.get('binance_secret')
@@ -32,18 +35,32 @@ print(price['COP'])
 book = load_workbook("log.xlsx")
 sheet = book.active
  
-def bye(sysTrayIcon):
+
+
+def bye(systray):
     os.system("taskkill /f /im  python.exe")
 
-menu_options = (())
+def graph(systray):
+    data = pd.read_excel('C:\\Users\\User\\Desktop\\Coding\\Python\\9dbtc\\log.xlsx')
+    precio = data['worth']
+    data.head()
+    plt.plot( precio, color='green')
+    plt.title('My 9$ bitcoin investment', fontsize=14)
+    plt.ylabel('9$ worth of bitcoin', fontsize=14)
+    plt.grid(True)
+    plt.show()
+    
+menu_options = (("Show Graph", None, graph),)
 systray = SysTrayIcon("../9dbtc/img/btc.ico", "9dbtc", menu_options, on_quit=bye)
 systray.start()
 
+
+
 def save_data(delay):
-    saving = True
     sheet.column_dimensions["A"].width = 25
     sheet.column_dimensions["B"].width = 25
     sheet.column_dimensions["C"].width = 25
+    sheet.column_dimensions["D"].width = 25
     while True:
         client = Client(api_key, api_secret)
         btc_price = client.get_symbol_ticker(symbol="BTCUSDT")
@@ -52,8 +69,8 @@ def save_data(delay):
         d9 = amount * float(price['COP']) / 1
         
         sheet['A1'] = "Date"
-        sheet['B1'] = "Price"
-        sheet['C1'] = "Your bitcoin is worth"
+        sheet['B1'] = "price"
+        sheet['C1'] = "worth"
         lastRowA = 'A' + str(sheet.max_row + 1)
         lastRowB = 'B' + str(sheet.max_row + 1)
         lastRowC = 'C' + str(sheet.max_row + 1)
@@ -63,6 +80,11 @@ def save_data(delay):
         book.save('log.xlsx')
         time.sleep(delay)
 
+
+
+
+
+
 print("#####################################")
 print("#                                   #")
 print("#                                   #")
@@ -71,4 +93,7 @@ print("#                                   #")
 print("#                                   #")
 print("#####################################")
 
-save_data(1800)
+# save_data(1800)
+
+
+
